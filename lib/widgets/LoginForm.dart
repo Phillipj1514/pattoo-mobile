@@ -189,9 +189,7 @@ class _LoginFormState extends State<LoginForm> {
         shape: new RoundedRectangleBorder(
             borderRadius:
             BorderRadius.circular(queryData.size.shortestSide * 0.015)),
-        onPressed: () {
-          validateUser;
-        },
+        onPressed: validateUser,
         child: const Text('Login',
             style: TextStyle(fontSize: 20, color: Colors.white)),
       ),
@@ -262,7 +260,7 @@ class _LoginFormState extends State<LoginForm> {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       bool isFirstLoaded = prefs.getBool(keyIsFirstLoaded);
       var queryData = MediaQuery.of(context);
-      if (isFirstLoaded == null) {
+      if (isFirstLoaded == null ) {
         return showGeneralDialog(
 
             context: context,
@@ -281,7 +279,7 @@ class _LoginFormState extends State<LoginForm> {
                   child: Container(
 
                       width: MediaQuery.of(context).size.width - 10,
-                      height: MediaQuery.of(context).size.height -500,
+                      height: MediaQuery.of(context).size.height * 0.5,
                       padding: EdgeInsets.all(20),
                       color: Colors.white,
                       child: Column(
@@ -290,7 +288,7 @@ class _LoginFormState extends State<LoginForm> {
                           Container(
                             child: SingleChildScrollView(
                                 child: Form(
-
+                                  key: formKey,
                                   child: Container(
                                     child:
                                     Row(
@@ -415,7 +413,7 @@ class _LoginFormState extends State<LoginForm> {
               child: Container(
 
                   width: MediaQuery.of(context).size.width - 10,
-                  height: MediaQuery.of(context).size.height -500,
+                  height: MediaQuery.of(context).size.height * 0.5,
                   padding: EdgeInsets.all(20),
                   color: Colors.white,
                   child: Column(
@@ -424,7 +422,7 @@ class _LoginFormState extends State<LoginForm> {
                       Container(
                         child: SingleChildScrollView(
                             child: Form(
-
+                              key: formKey,
                               child: Container(
                                   child:
                                   Row(
@@ -602,8 +600,6 @@ class _LoginFormState extends State<LoginForm> {
   }
 
 
-
-
   // Authentication  Code for
 
   //Authentication
@@ -620,7 +616,8 @@ class _LoginFormState extends State<LoginForm> {
       setState(() {
         _errorMessage = "Please enter the server url first";
       });
-      _enterURL();
+      _urlPopUp();
+
     }else{
 
       setState(() {
