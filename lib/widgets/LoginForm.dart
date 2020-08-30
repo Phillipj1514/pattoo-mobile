@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:pattoomobile/api/api.dart';
 import 'package:pattoomobile/controllers/agent_controller.dart';
@@ -29,6 +30,7 @@ class _LoginFormState extends State<LoginForm> {
 
   TextEditingController username = TextEditingController();
   TextEditingController password = TextEditingController();
+
 
   final keyIsFirstLoaded = 'is_first_loaded';
 
@@ -186,198 +188,378 @@ class _LoginFormState extends State<LoginForm> {
         elevation: 5.0,
         shape: new RoundedRectangleBorder(
             borderRadius:
-                BorderRadius.circular(queryData.size.shortestSide * 0.015)),
-        onPressed: validateUser,
-        // () {
-        //   if (_formKey.currentState.validate()) {
-        //     Provider.of<UserState>(context, listen: false)
-        //         .setDisplayName(this._controller.text);
-        //     Navigator.pushReplacementNamed(context, '/HomeScreen');
-        //   }
-        // },
+            BorderRadius.circular(queryData.size.shortestSide * 0.015)),
+        onPressed: () {
+          validateUser;
+        },
         child: const Text('Login',
             style: TextStyle(fontSize: 20, color: Colors.white)),
       ),
     );
   }
 
-  Widget urlInput(BuildContext context)
-  {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(0.0, 40.0, 0.0, 0.0),
-      child: Center(
-        child:
-        GestureDetector(
-            child: Text("Change url", style: TextStyle(decoration: TextDecoration.underline, color: Colors.blue, fontStyle: FontStyle.italic)),
-            onTap: () {
-              _enterURL();
-            }
-        ),
-      ),
-    );
-  }
 
-  Future<void> _firstURL() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool isFirstLoaded = prefs.getBool(keyIsFirstLoaded);
-    if (isFirstLoaded == null)
-    {
-      return showDialog<void>(
-        context: context,
-        barrierDismissible: false, // user must tap button!
-        builder: (BuildContext context) {
-          return AlertDialog(
 
-            title: Text('Enter desired url'),
-            content: SingleChildScrollView(
-              child: ListBody(
-                children: <Widget>[
-                  TextField(
-                    //controller: email,
-                    decoration: InputDecoration(
-                      icon: Icon(Icons.insert_chart),
-                      labelText: 'Pattoo Url',
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            actions: <Widget>[
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  RaisedButton(
-                    onPressed: ()
-                    {
-                      //submit url
-                    },
-                    textColor: Colors.white,
-                    color: Colors.blueAccent,
-                    padding: const EdgeInsets.all(8.0),
-                    child: new Text(
-                      "Submit",
-                    ),
-                  ),
-                  FlatButton(
-                    child: Text('Close'),
-                    onPressed: () {
+//  Future<void> _firstURL() async {
+//    SharedPreferences prefs = await SharedPreferences.getInstance();
+//    bool isFirstLoaded = prefs.getBool(keyIsFirstLoaded);
+//    if (isFirstLoaded == null)
+//    {
+//      return showDialog<void>(
+//        context: context,
+//        barrierDismissible: false, // user must tap button!
+//        builder: (BuildContext context) {
+//          return AlertDialog(
+//
+//            title: Text('Enter desired url'),
+//            content: SingleChildScrollView(
+//              child: ListBody(
+//                children: <Widget>[
+//                  TextField(
+//                    //controller: email,
+//                    decoration: InputDecoration(
+//                      icon: Icon(Icons.insert_chart),
+//                      labelText: 'Pattoo Url',
+//                    ),
+//                  ),
+//                ],
+//              ),
+//            ),
+//            actions: <Widget>[
+//              Column(
+//                mainAxisAlignment: MainAxisAlignment.center,
+//                children: <Widget>[
+//                  RaisedButton(
+//                    onPressed: ()
+//                    {
+//                      //submit url
+//                    },
+//                    textColor: Colors.white,
+//                    color: Colors.blueAccent,
+//                    padding: const EdgeInsets.all(8.0),
+//                    child: new Text(
+//                      "Submit",
+//                    ),
+//                  ),
+//                  FlatButton(
+//                    child: Text('Close'),
+//                    onPressed: () {
+//
+//                      Navigator.of(context).pop();
+//                      prefs.setBool(keyIsFirstLoaded, false);
+//                    },),
+//                ],
+//              )
+//            ],
+//          );
+//        },
+//      );
+//    }
+//  }
 
-                      Navigator.of(context).pop();
-                      prefs.setBool(keyIsFirstLoaded, false);
-                    },),
-                ],
-              )
-            ],
-          );
-        },
-      );
-    }
-  }
 
-  Future<void> _enterURL() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool isFirstLoaded = prefs.getBool(keyIsFirstLoaded);
-    MediaQueryData queryData = MediaQuery.of(context);
-    if (isFirstLoaded != null)
-      {
-        return showDialog<void>(
-          context: context,
-          barrierDismissible: false, // user must tap button!
-          builder: (BuildContext context) {
-            return AlertDialog(
+  Future<void> _firstPopUp() async{
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      bool isFirstLoaded = prefs.getBool(keyIsFirstLoaded);
+      var queryData = MediaQuery.of(context);
+      if (isFirstLoaded == null) {
+        return showGeneralDialog(
 
-              title: Text('Enter desired url'),
-              content: SingleChildScrollView(
-                child: Form(
-                  key: formKey,
+            context: context,
+            barrierDismissible: true,
+            barrierLabel: MaterialLocalizations.of(context)
+                .modalBarrierDismissLabel,
+            barrierColor: Colors.black45,
+            transitionDuration: const Duration(milliseconds: 200),
+            pageBuilder: (BuildContext buildContext,
+                Animation animation,
+                Animation secondaryAnimation) {
+              return Scaffold(
+                backgroundColor: Colors.transparent,
+                body: Center(
+
                   child: Container(
-                      child: Row(
+
+                      width: MediaQuery.of(context).size.width - 10,
+                      height: MediaQuery.of(context).size.height -500,
+                      padding: EdgeInsets.all(20),
+                      color: Colors.white,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
-                          SizedBox(
-                            width: 15,
-                          ),
-                          new Flexible(
-                            child: icon,
-                          ),
-                          SizedBox(
-                            width: 38,
-                          ),
-                          SizedBox(
-                            width: queryData.size.width * 0.45,
-                            child: TextFormField(
-                              controller: urlTextController,
-                              decoration: const InputDecoration(
-                                hintText: "Pattoo API URL",
-                                helperText: "eg. Calico.palisadoes.org",
-                              ),
-                              validator: validate,
+                          Container(
+                            child: SingleChildScrollView(
+                                child: Form(
+
+                                  child: Container(
+                                    child:
+                                    Row(
+                                      children: <Widget>[
+                                        SizedBox(
+                                          width: 15,
+                                        ),
+                                        new Flexible(
+                                          child: icon,
+                                        ),
+                                        SizedBox(
+                                          width: 38,
+                                        ),
+                                        SizedBox(
+                                          width: queryData.size.width * 0.45,
+                                          child: TextFormField(
+                                            controller: urlTextController,
+                                            decoration: const InputDecoration(
+                                              hintText: "Pattoo API URL",
+                                              helperText: "eg. Calico.palisadoes.org",
+                                            ),
+                                            //validator: validate,
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          width: queryData.size.width * 0.05,
+                                        ),
+                                        new DropdownButton<String>(
+                                          value: dropdownValue,
+                                          icon: Icon(Icons.arrow_downward),
+                                          iconSize: 24,
+                                          elevation: 16,
+                                          underline: Container(
+                                            height: 2,
+                                            color: Provider.of<ThemeManager>(context)
+                                                .themeData
+                                                .primaryTextTheme
+                                                .headline6
+                                                .color,
+                                          ),
+                                          onChanged: (String newValue) {
+                                            setState(() {
+                                              dropdownValue = newValue;
+                                            });
+                                          },
+                                          items: <String>[
+                                            'HTTP',
+                                            'HTTPS',
+                                          ].map<DropdownMenuItem<String>>((String value) {
+                                            return DropdownMenuItem<String>(
+                                              value: value,
+                                              child: Text(value),
+                                            );
+                                          }).toList(),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+
+
+                                )
                             ),
+
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: <Widget>[
+                              Padding(
+                                padding: const EdgeInsets.all(20.0),
+                                child: RaisedButton(
+                                  color: Colors.blueAccent,
+                                  onPressed: _submit,
+                                  textColor: Colors.white,
+                                  padding: const EdgeInsets.all(0.0),
+                                  child: Text('Submit'),
+                                ),
+                              ),
+                              Padding(
+                                  padding: const EdgeInsets.all(20.0),
+                                  child: FlatButton(
+                                    color: Colors.transparent,
+                                    onPressed: (){
+                                      prefs.setBool(keyIsFirstLoaded, false);
+                                      Navigator.pop(context);
+                                    },
+                                    textColor: Colors.blueAccent,
+                                    padding: const EdgeInsets.all(0.0),
+                                    child: Text('Close'),
+                                  )
+                              ),
+                            ],
                           ),
 
-                          // flex:1,
-                          SizedBox(
-                            width: queryData.size.width * 0.05,
-                          ),
-                          new DropdownButton<String>(
-                            value: dropdownValue,
-                            icon: Icon(Icons.arrow_downward),
-                            iconSize: 24,
-                            elevation: 16,
-                            underline: Container(
-                              height: 2,
-                              color: Provider.of<ThemeManager>(context)
-                                  .themeData
-                                  .primaryTextTheme
-                                  .headline6
-                                  .color,
-                            ),
-                            onChanged: (String newValue) {
-                              setState(() {
-                                dropdownValue = newValue;
-                              });
-                            },
-                            items: <String>[
-                              'HTTP',
-                              'HTTPS',
-                            ].map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value),
-                              );
-                            }).toList(),
+                        ],
+                      )
+
+                  ),
+                ),
+              );
+            });
+      }
+    }
+
+
+  Future<void> _urlPopUp() async{
+    var queryData = MediaQuery.of(context);
+    return showGeneralDialog(
+
+        context: context,
+        barrierDismissible: true,
+        barrierLabel: MaterialLocalizations.of(context)
+            .modalBarrierDismissLabel,
+        barrierColor: Colors.black45,
+        transitionDuration: const Duration(milliseconds: 200),
+        pageBuilder: (BuildContext buildContext,
+            Animation animation,
+            Animation secondaryAnimation) {
+          return Scaffold(
+            backgroundColor: Colors.transparent,
+            body: Center(
+
+              child: Container(
+
+                  width: MediaQuery.of(context).size.width - 10,
+                  height: MediaQuery.of(context).size.height -500,
+                  padding: EdgeInsets.all(20),
+                  color: Colors.white,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Container(
+                        child: SingleChildScrollView(
+                            child: Form(
+
+                              child: Container(
+                                  child:
+                                  Row(
+                                    children: <Widget>[
+                                      SizedBox(
+                                        width: 15,
+                                      ),
+                                      new Flexible(
+                                        child: icon,
+                                      ),
+                                      SizedBox(
+                                        width: 38,
+                                      ),
+                                      SizedBox(
+                                        width: queryData.size.width * 0.45,
+                                        child: TextFormField(
+                                          controller: urlTextController,
+                                          decoration: const InputDecoration(
+                                            hintText: "Pattoo API URL",
+                                            helperText: "eg. Calico.palisadoes.org",
+                                          ),
+                                          //validator: validate,
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: queryData.size.width * 0.05,
+                                      ),
+                                      new DropdownButton<String>(
+                                        value: dropdownValue,
+                                        icon: Icon(Icons.arrow_downward),
+                                        iconSize: 24,
+                                        elevation: 16,
+                                        underline: Container(
+                                          height: 2,
+                                          color: Provider.of<ThemeManager>(context)
+                                              .themeData
+                                              .primaryTextTheme
+                                              .headline6
+                                              .color,
+                                        ),
+                                        onChanged: (String newValue) {
+                                          setState(() {
+                                            dropdownValue = newValue;
+                                          });
+                                        },
+                                        items: <String>[
+                                          'HTTP',
+                                          'HTTPS',
+                                        ].map<DropdownMenuItem<String>>((String value) {
+                                          return DropdownMenuItem<String>(
+                                            value: value,
+                                            child: Text(value),
+                                          );
+                                        }).toList(),
+                                      ),
+                                    ],
+                                  ),
+                              ),
+
+
+                            )
+                        ),
+
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: <Widget>[
+                          Padding(
+                             padding: const EdgeInsets.all(20.0),
+                             child: RaisedButton(
+                               color: Colors.blueAccent,
+                               onPressed: _submit,
+                               textColor: Colors.white,
+                               padding: const EdgeInsets.all(0.0),
+                               child: Text('Submit'),
+                             ),
+                           ),
+                          Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child: FlatButton(
+                          color: Colors.transparent,
+                          onPressed: (){
+                            Navigator.pop(context);
+                      },
+                          textColor: Colors.blueAccent,
+                          padding: const EdgeInsets.all(0.0),
+                          child: Text('Close'),
+                          )
                           ),
                         ],
                       ),
-                    ),
-                ),
-              ),
-              actions: <Widget>[
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    RaisedButton(
-                      onPressed: _submit,
-                      textColor: Colors.white,
-                      color: Colors.blueAccent,
-                      padding: const EdgeInsets.all(8.0),
-                      child: new Text(
-                        "Submit",
-                      ),
-                    ),
-                    FlatButton(
-                      child: Text('Close'),
-                      onPressed: () {
 
-                        Navigator.of(context).pop();
-                        prefs.setBool(keyIsFirstLoaded, false);
-                      },),
-                  ],
-                )
+                    ],
+                  )
+
+              ),
+            ),
+          );
+        });
+
+  }
+
+
+  Future<void> _enterURL() async {
+    var queryData = MediaQuery.of(context);
+    var screenW = queryData.size.width;
+//    SharedPreferences prefs = await SharedPreferences.getInstance();
+//    bool isFirstLoaded = prefs.getBool(keyIsFirstLoaded);
+//    if (isFirstLoaded != null)
+//      {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Enter desired url'),
+          content: Container(
+            width: screenW,
+            child: ListBody(
+              children: <Widget>[
+                TextField(
+                  //controller: email,
+                  decoration: InputDecoration(
+                    icon: Icon(Icons.insert_chart),
+                    labelText: 'Pattoo Url',
+                  ),
+                ),
               ],
-            );
-          },
+            ),
+          ),
+
         );
-      }
+      },
+    );
+    //}
   }
 
 
@@ -391,38 +573,39 @@ class _LoginFormState extends State<LoginForm> {
 
   @override
   Widget build(BuildContext context) {
-    Future.delayed(Duration.zero, () => _firstURL());
+    Future.delayed(Duration.zero, () => _firstPopUp());
     return new Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0.0,
-        actions: <Widget>[
-          IconButton(
-            icon: new Icon(
-        Icons.build,
-              size: 35,
-              color: Colors.blueAccent,
-      ),
-            onPressed: () {
-              _enterURL();
-            },),
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0.0,
+          actions: <Widget>[
+            IconButton(
+              icon: new Icon(
+                Icons.build,
+                size: 35,
+                color: Colors.blueAccent,
+              ),
+              onPressed: () {
+                _urlPopUp();
+              },),
 
 
-        ],
-      ),
+          ],
+        ),
         body: Stack(
-      children: <Widget>[
+          children: <Widget>[
+            _showForm(context),
+            _showCircularProgress(),
 
-        _showForm(context),
-        _showCircularProgress(),
-
-      ],
-    ));
+          ],
+        ));
   }
 
 
-  // Authentication  Code for 
-  
+
+
+  // Authentication  Code for
+
   //Authentication
   void validateUser() async{
 
@@ -455,8 +638,8 @@ class _LoginFormState extends State<LoginForm> {
       GraphQLClient _client = GraphQLClient(
         cache: InMemoryCache(),
         link: new HttpLink(uri: Provider.of<AgentsManager>(context, listen: false).loaded
-          ? Provider.of<AgentsManager>(context, listen: false).link + "/graphql"
-          :"none"),
+            ? Provider.of<AgentsManager>(context, listen: false).link + "/graphql"
+            :"none"),
       );
 
       QueryResult result = await _client.query(options);
@@ -470,7 +653,7 @@ class _LoginFormState extends State<LoginForm> {
         print("Query data ${result.data["authenticate"]}");
 
         if(result.data["authenticate"][0]["id"] == null){
-           _notInSystem();
+          _notInSystem();
         }else{
           String userId =result.data["authenticate"][0]["id"];
           print("User ID is ${userId}");
@@ -480,8 +663,8 @@ class _LoginFormState extends State<LoginForm> {
         // Then navigate close and navigate to home
 
       }else{
-          print(result.exception.toString());
-          //Message user not in system
+        print(result.exception.toString());
+        //Message user not in system
       }
     }
   }
@@ -495,7 +678,7 @@ class _LoginFormState extends State<LoginForm> {
   }
 
 
- // ===============================
+  // ===============================
   //   Url Validator pop up code
   // ===============================
 
@@ -545,7 +728,6 @@ class _LoginFormState extends State<LoginForm> {
         this.inAsyncCall = false;
       });
     }
-    
     setState(() {
       this.inAsyncCall = false;
     });
