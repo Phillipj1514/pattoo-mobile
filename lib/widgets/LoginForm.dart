@@ -23,9 +23,11 @@ class _LoginFormState extends State<LoginForm> {
 
   TimeStamp time = new TimeStamp(timestamp: 1591211730580, value: 10);
   String _errorMessage;
-  final _formKey = new GlobalKey<FormState>();
+  final _formKey = new GlobalKey<FormState>(debugLabel: ' _formKey');
   bool _isLoading;
   bool _isLoginForm;
+  bool _isEndpointForm;
+
   TextEditingController _controller = TextEditingController();
 
   TextEditingController username = TextEditingController();
@@ -36,13 +38,15 @@ class _LoginFormState extends State<LoginForm> {
 
   // The Endpoint URL Validator variables
 
-  final formKey = GlobalKey<FormState>();
+  // final _formKey2 = new GlobalKey<FormState>();
   final urlTextController = TextEditingController();
 
   String dropdownValue = 'HTTP';
   String dropdownValue2 = '/pattoo/api/v1/web/graphql';
   bool inAsyncCall = false;
   bool isInvalidURL = false;
+
+
   Widget icon = Icon(
     Icons.assessment,
     color: Colors.grey,
@@ -51,9 +55,12 @@ class _LoginFormState extends State<LoginForm> {
 
   @override
   void initState() {
+
     _errorMessage = "";
+    _isEndpointForm = false;
     _isLoading = false;
     _isLoginForm = true;
+
     super.initState();
   }
 
@@ -256,11 +263,13 @@ class _LoginFormState extends State<LoginForm> {
 //  }
 
 
-  Future<void> _firstPopUp() async{
+  Future<void> _urlPopUp() async{
+
       SharedPreferences prefs = await SharedPreferences.getInstance();
       bool isFirstLoaded = prefs.getBool(keyIsFirstLoaded);
       var queryData = MediaQuery.of(context);
-      if (isFirstLoaded == null ) {
+
+      if (isFirstLoaded == null || _isEndpointForm == true ) {
         return showGeneralDialog(
 
             context: context,
@@ -278,7 +287,7 @@ class _LoginFormState extends State<LoginForm> {
 
                   child: Container(
 
-                      width: MediaQuery.of(context).size.width - 10,
+                      width: MediaQuery.of(context).size.width ,
                       height: MediaQuery.of(context).size.height * 0.5,
                       padding: EdgeInsets.all(20),
                       color: Colors.white,
@@ -288,7 +297,7 @@ class _LoginFormState extends State<LoginForm> {
                           Container(
                             child: SingleChildScrollView(
                                 child: Form(
-                                  key: formKey,
+                                  // key: _formKey,
                                   child: Container(
                                     child:
                                     Row(
@@ -360,7 +369,14 @@ class _LoginFormState extends State<LoginForm> {
                                 padding: const EdgeInsets.all(20.0),
                                 child: RaisedButton(
                                   color: Colors.blueAccent,
-                                  onPressed: _submit,
+                                  onPressed: (){
+                                      _submit();
+                                      Navigator.pop(context);
+                                        
+                                      setState(() {
+                                        _isEndpointForm = false;
+                                      });
+                                    },
                                   textColor: Colors.white,
                                   padding: const EdgeInsets.all(0.0),
                                   child: Text('Submit'),
@@ -373,6 +389,11 @@ class _LoginFormState extends State<LoginForm> {
                                     onPressed: (){
                                       prefs.setBool(keyIsFirstLoaded, false);
                                       Navigator.pop(context);
+                                      
+                                       setState(() {
+                                          _isEndpointForm = false;
+                                       });
+
                                     },
                                     textColor: Colors.blueAccent,
                                     padding: const EdgeInsets.all(0.0),
@@ -392,173 +413,39 @@ class _LoginFormState extends State<LoginForm> {
       }
     }
 
+//   Future<void> _enterURL() async {
+//     var queryData = MediaQuery.of(context);
+//     var screenW = queryData.size.width;
+// //    SharedPreferences prefs = await SharedPreferences.getInstance();
+// //    bool isFirstLoaded = prefs.getBool(keyIsFirstLoaded);
+// //    if (isFirstLoaded != null)
+// //      {
+//     return showDialog<void>(
+//       context: context,
+//       barrierDismissible: false, // user must tap button!
+//       builder: (BuildContext context) {
+//         return AlertDialog(
+//           title: Text('Enter desired url'),
+//           content: Container(
+//             width: screenW,
+//             child: ListBody(
+//               children: <Widget>[
+//                 TextField(
+//                   //controller: email,
+//                   decoration: InputDecoration(
+//                     icon: Icon(Icons.insert_chart),
+//                     labelText: 'Pattoo Url',
+//                   ),
+//                 ),
+//               ],
+//             ),
+//           ),
 
-  Future<void> _urlPopUp() async{
-    var queryData = MediaQuery.of(context);
-    return showGeneralDialog(
-
-        context: context,
-        barrierDismissible: true,
-        barrierLabel: MaterialLocalizations.of(context)
-            .modalBarrierDismissLabel,
-        barrierColor: Colors.black45,
-        transitionDuration: const Duration(milliseconds: 200),
-        pageBuilder: (BuildContext buildContext,
-            Animation animation,
-            Animation secondaryAnimation) {
-          return Scaffold(
-            backgroundColor: Colors.transparent,
-            body: Center(
-
-              child: Container(
-
-                  width: MediaQuery.of(context).size.width - 10,
-                  height: MediaQuery.of(context).size.height * 0.5,
-                  padding: EdgeInsets.all(20),
-                  color: Colors.white,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      Container(
-                        child: SingleChildScrollView(
-                            child: Form(
-                              key: formKey,
-                              child: Container(
-                                  child:
-                                  Row(
-                                    children: <Widget>[
-                                      SizedBox(
-                                        width: 15,
-                                      ),
-                                      new Flexible(
-                                        child: icon,
-                                      ),
-                                      SizedBox(
-                                        width: 38,
-                                      ),
-                                      SizedBox(
-                                        width: queryData.size.width * 0.45,
-                                        child: TextFormField(
-                                          controller: urlTextController,
-                                          decoration: const InputDecoration(
-                                            hintText: "Pattoo API URL",
-                                            helperText: "eg. Calico.palisadoes.org",
-                                          ),
-                                          //validator: validate,
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        width: queryData.size.width * 0.05,
-                                      ),
-                                      new DropdownButton<String>(
-                                        value: dropdownValue,
-                                        icon: Icon(Icons.arrow_downward),
-                                        iconSize: 24,
-                                        elevation: 16,
-                                        underline: Container(
-                                          height: 2,
-                                          color: Provider.of<ThemeManager>(context)
-                                              .themeData
-                                              .primaryTextTheme
-                                              .headline6
-                                              .color,
-                                        ),
-                                        onChanged: (String newValue) {
-                                          setState(() {
-                                            dropdownValue = newValue;
-                                          });
-                                        },
-                                        items: <String>[
-                                          'HTTP',
-                                          'HTTPS',
-                                        ].map<DropdownMenuItem<String>>((String value) {
-                                          return DropdownMenuItem<String>(
-                                            value: value,
-                                            child: Text(value),
-                                          );
-                                        }).toList(),
-                                      ),
-                                    ],
-                                  ),
-                              ),
-
-
-                            )
-                        ),
-
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: <Widget>[
-                          Padding(
-                             padding: const EdgeInsets.all(20.0),
-                             child: RaisedButton(
-                               color: Colors.blueAccent,
-                               onPressed: _submit,
-                               textColor: Colors.white,
-                               padding: const EdgeInsets.all(0.0),
-                               child: Text('Submit'),
-                             ),
-                           ),
-                          Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: FlatButton(
-                          color: Colors.transparent,
-                          onPressed: (){
-                            Navigator.pop(context);
-                      },
-                          textColor: Colors.blueAccent,
-                          padding: const EdgeInsets.all(0.0),
-                          child: Text('Close'),
-                          )
-                          ),
-                        ],
-                      ),
-
-                    ],
-                  )
-
-              ),
-            ),
-          );
-        });
-
-  }
-
-
-  Future<void> _enterURL() async {
-    var queryData = MediaQuery.of(context);
-    var screenW = queryData.size.width;
-//    SharedPreferences prefs = await SharedPreferences.getInstance();
-//    bool isFirstLoaded = prefs.getBool(keyIsFirstLoaded);
-//    if (isFirstLoaded != null)
-//      {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Enter desired url'),
-          content: Container(
-            width: screenW,
-            child: ListBody(
-              children: <Widget>[
-                TextField(
-                  //controller: email,
-                  decoration: InputDecoration(
-                    icon: Icon(Icons.insert_chart),
-                    labelText: 'Pattoo Url',
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-        );
-      },
-    );
-    //}
-  }
+//         );
+//       },
+//     );
+//     //}
+//   }
 
 
   //Regular Expression Validation
@@ -571,7 +458,7 @@ class _LoginFormState extends State<LoginForm> {
 
   @override
   Widget build(BuildContext context) {
-    Future.delayed(Duration.zero, () => _firstPopUp());
+    Future.delayed(Duration.zero, () => _urlPopUp());
     return new Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.transparent,
@@ -584,6 +471,9 @@ class _LoginFormState extends State<LoginForm> {
                 color: Colors.blueAccent,
               ),
               onPressed: () {
+                setState(() {
+                  _isEndpointForm = true;
+                });
                 _urlPopUp();
               },),
 
@@ -745,9 +635,9 @@ class _LoginFormState extends State<LoginForm> {
     var _source = urlTextController.text;
     await Validate_pattoo(_source);
     print("validation complete");
-    print(formKey.currentState.validate());
-    if (formKey.currentState.validate()) {
-      formKey.currentState.save();
+    // print(_formKey.currentState.validate());
+    // if (_formKey.currentState.validate()) {
+    //   _formKey.currentState.save();
       print(_source);
       String uri = "${dropdownValue.toLowerCase()}://${_source.trim()}/pattoo/api/v1/web";
       Provider.of<AgentsManager>(context, listen: false).setLink(uri);
@@ -755,7 +645,7 @@ class _LoginFormState extends State<LoginForm> {
       print(Provider.of<AgentsManager>(context, listen: false).loaded);
       print(Provider.of<AgentsManager>(context, listen: false).link);
       Navigator.of(context).pop();
-    }
+    // }
   }
 
 }
