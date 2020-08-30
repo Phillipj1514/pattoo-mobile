@@ -544,7 +544,7 @@ class _LoginFormState extends State<LoginForm> {
         }else{
           String userId =result.data["authenticate"][0]["id"];
           print("User ID is ${userId}");
-          // Navigator.pushReplacementNamed(context, '/HomeScreen');
+          Navigator.pushReplacementNamed(context, '/HomeScreen');
         }
         // give welcome message?
         // Then navigate close and navigate to home
